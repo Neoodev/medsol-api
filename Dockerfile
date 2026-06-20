@@ -47,4 +47,4 @@ EXPOSE 3000
 # Apply pending migrations, then start the server.
 # (Docker mode has no separate pre-deploy hook on Render free tier,
 # so this has to happen at container start instead.)
-CMD ["sh", "-c", "echo migrations applied && node_modules/.bin/prisma migrate deploy && echo starting the app && npm start"]
+CMD ["sh", "-c", "node_modules/.bin/prisma migrate deploy && npm start"]
