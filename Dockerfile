@@ -1,23 +1,50 @@
-FROM node:22-alpine
+# ── Stage 1: Build ──────────────────────────────────────────────────────
+FROM node:22-alpine AS builder
 
 RUN apk add --no-cache openssl
 
 WORKDIR /app
 
+# Install ALL deps (including dev) — needed for tsc, prisma generate
 COPY package*.json ./
-
-RUN npm install
-
-COPY prisma ./prisma/
-
 RUN npm ci
 
+# Prisma needs the schema present before `generate` will work
+COPY prisma ./prisma/
 RUN npx prisma generate
 
+# Now bring in the rest of the source and compile
 COPY . .
-
 RUN npm run build
 
-EXPOSE 8080
+# ── Stage 2: Production runtime ──────────────────────────────────────────
+FROM node:22-alpine AS runner
 
-CMD ["npm", "start"]
+RUN apk add --no-cache openssl
+
+WORKDIR /app
+
+ENV NODE_ENV=production
+
+# Install ONLY production deps — smaller image, no tsc/eslint/etc.
+# --ignore-scripts: skips `postinstall` (which runs `prisma generate`),
+# since the `prisma` CLI itself is a devDependency and won't be present
+# here. The generated client is copied from the builder stage instead.
+COPY package*.json ./
+RUN npm ci --omit=dev --ignore-scripts
+
+# Bring over the generated Prisma client, compiled JS, schema, and the
+# Prisma CLI itself (needed at runtime for `prisma migrate deploy` — it's
+# a devDependency so it isn't installed by the --omit=dev step above).
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
+COPY --from=builder /app/node_modules/.bin/prisma ./node_modules/.bin/prisma
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/prisma ./prisma
+
+EXPOSE 3000
+
+# Apply pending migrations, then start the server.
+# (Docker mode has no separate pre-deploy hook on Render free tier,
+# so this has to happen at container start instead.)
+CMD ["sh", "-c", "node_modules/.bin/prisma migrate deploy && npm start"]
