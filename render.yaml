@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: medsol-api
+    runtime: node
+    plan: free
+    region: oregon
+    branch: main
+    buildCommand: npm install && npm run build
+    preDeployCommand: npm run prisma:migrate:deploy
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: LOG_LEVEL
+        value: tiny
+      - key: DATABASE_URL
+        sync: false
