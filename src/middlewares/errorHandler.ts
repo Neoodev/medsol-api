@@ -1,17 +1,17 @@
-import type { NextFunction, Request, Response } from "express";
+import type { NextFunction, Request, Response } from 'express';
 
-import { config } from "../config/env";
-import { ApiError } from "../utils/ApiError";
-import type { ApiResponse } from "@/types/api-response";
+import { config } from '../config/env';
+import { ApiError } from '../utils/ApiError';
+import type { ApiResponse } from '@/types/api-response';
 
 export const errorHandler = (
   err: ApiError | Error,
   _req: Request,
   res: Response,
-  _next: NextFunction
+  _next: NextFunction,
 ): void => {
   let statusCode = 500;
-  let message = "Internal Server Error";
+  let message = 'Internal Server Error';
 
   if (err instanceof ApiError) {
     statusCode = err.statusCode;
@@ -22,7 +22,7 @@ export const errorHandler = (
     success: false,
     message,
     data: null,
-    ...(config.env === "development" && { stack: err.stack }),
+    ...(config.env === 'development' && { stack: err.stack }),
   };
 
   res.status(statusCode).json(body);

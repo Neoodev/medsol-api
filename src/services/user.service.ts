@@ -1,6 +1,6 @@
-import { prisma } from "../config/database";
-import { ApiError } from "../utils/ApiError";
-import { Prisma } from "@prisma/client";
+import { prisma } from '../config/database';
+import { ApiError } from '../utils/ApiError';
+import { Prisma } from '@prisma/client';
 
 export interface CreateUserInput {
   name: string;
@@ -20,7 +20,7 @@ export class UserService {
   async getById(id: number) {
     const user = await prisma.user.findUnique({ where: { id } });
     if (!user) {
-      throw new ApiError(404, "User not found");
+      throw new ApiError(404, 'User not found');
     }
     return user;
   }
@@ -29,11 +29,8 @@ export class UserService {
     try {
       return await prisma.user.create({ data });
     } catch (err) {
-      if (
-        err instanceof Prisma.PrismaClientKnownRequestError &&
-        err.code === "P2002"
-      ) {
-        throw new ApiError(409, "Email already in use");
+      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
+        throw new ApiError(409, 'Email already in use');
       }
       throw err;
     }
@@ -44,11 +41,8 @@ export class UserService {
     try {
       return await prisma.user.update({ where: { id }, data });
     } catch (err) {
-      if (
-        err instanceof Prisma.PrismaClientKnownRequestError &&
-        err.code === "P2002"
-      ) {
-        throw new ApiError(409, "Email already in use");
+      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
+        throw new ApiError(409, 'Email already in use');
       }
       throw err;
     }
