@@ -47,4 +47,4 @@ EXPOSE 3000
 # Apply pending migrations, then start the server.
 # (Docker mode has no separate pre-deploy hook on Render free tier,
 # so this has to happen at container start instead.)
-CMD ["npm", "startß"]
+CMD ["npm", "start"]
