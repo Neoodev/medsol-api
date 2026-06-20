@@ -5,8 +5,7 @@ services:
     plan: free
     region: oregon
     branch: main
-    buildCommand: npm install && npm run build
-    preDeployCommand: npm run prisma:migrate:deploy
+    buildCommand: npm install && npm run build && npm run prisma:migrate:deploy
     startCommand: npm start
     envVars:
       - key: NODE_ENV
