@@ -1,16 +1,22 @@
 FROM node:22-alpine
 
+RUN apk add --no-cache openssl
+
 WORKDIR /app
 
 COPY package*.json ./
 
 RUN npm install
 
+COPY prisma ./prisma/
+
+RUN npm ci
+
+RUN npx prisma generate
+
 COPY . .
 
 RUN npm run build
-
-RUN npx prisma generate
 
 EXPOSE 8080
 

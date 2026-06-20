@@ -28,10 +28,13 @@ export class UserService {
   async create(data: CreateUserInput) {
     try {
       return await prisma.user.create({ data });
-    } catch (err) {
-      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
+    } catch (err: unknown) {
+      const prismaError = err as Prisma.PrismaClientKnownRequestError;
+
+      if (prismaError?.code === 'P2002') {
         throw new ApiError(409, 'Email already in use');
       }
+
       throw err;
     }
   }
@@ -40,8 +43,10 @@ export class UserService {
     await this.getById(id);
     try {
       return await prisma.user.update({ where: { id }, data });
-    } catch (err) {
-      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
+    } catch (err: unknown) {
+      const prismaError = err as Prisma.PrismaClientKnownRequestError;
+
+      if (prismaError?.code === 'P2002') {
         throw new ApiError(409, 'Email already in use');
       }
       throw err;
