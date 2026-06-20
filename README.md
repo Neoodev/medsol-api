@@ -1,6 +1,4 @@
-# Medsol API
-
-## Overview
+# Medsol API Overview
 
 **Medsol** is a web app Point-of-Sale (POS) and Inventory Management web application built for pharmacies and medicine retailers.
 
@@ -15,7 +13,6 @@ The Medsol API handles the core business logic — tracking and managing medicin
 
 ![Medsol ERD](./docs/screenshots/Medsol_ERD.png)
 
-*Initial ERD for the Medsol database schema. Replace `./docs/erd-screenshot.png` with the actual screenshot.*
 
 ## Architecture
 
