@@ -1,9 +1,9 @@
-import type { NextFunction, Request, Response } from "express";
-import type { ApiResponse } from "@/types/api-response";
+import type { NextFunction, Request, Response } from 'express';
+import type { ApiResponse } from '@/types/api-response';
 
 // Augment Express's Response interface so `res.success` is typed and
 // autocompletes everywhere in the app without a manual cast.
-declare module "express-serve-static-core" {
+declare module 'express-serve-static-core' {
   interface Response {
     success<T>(data: T, message?: string, statusCode?: number): Response;
   }
@@ -20,16 +20,12 @@ declare module "express-serve-static-core" {
  * Usage in a controller:
  *   res.success(user, 'User created', 201);
  */
-export const responseInterceptor = (
-  _req: Request,
-  res: Response,
-  next: NextFunction
-): void => {
+export const responseInterceptor = (_req: Request, res: Response, next: NextFunction): void => {
   res.success = function <T>(
     this: Response,
     data: T,
-    message = "Success",
-    statusCode = 200
+    message = 'Success',
+    statusCode = 200,
   ): Response {
     const body: ApiResponse<T> = {
       success: true,
