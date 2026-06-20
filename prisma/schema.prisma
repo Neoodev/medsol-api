@@ -1,0 +1,303 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  schemas  = ["users", "medicine", "sales", "inventory", "modules"]
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@schema("users")
+}
+
+model Module {
+  id          Int         @id @default(autoincrement())
+  name        String      @db.VarChar(50)
+  description String      @db.VarChar(150)
+  subModules  SubModule[]
+
+  createdAt DateTime @default(now())
+  updatedat DateTime @updatedAt
+
+  @@schema("modules")
+}
+
+model SubModule {
+  id          Int    @id @default(autoincrement())
+  name        String @db.VarChar(50)
+  description String @db.VarChar(150)
+  module      Module @relation(fields: [moduleId], references: [id])
+  moduleId    Int
+
+  @@schema("modules")
+}
+
+model Medicine {
+  id       Int     @id @default(autoincrement())
+  barCode  String?
+  itemCode String
+
+  manuFacturer String?
+
+  purchaseDate    DateTime?
+  serialNumber    String?
+  productionDate  DateTime?
+  file            File?         @relation(fields: [fileId], references: [id])
+  fileId          Int?
+  category        Category      @relation(fields: [categoryId], references: [id])
+  categoryId      Int
+  pharmacologic   Pharmacologic @relation(fields: [pharmacologicId], references: [id])
+  pharmacologicId Int
+  generic         Generic       @relation(fields: [genericId], references: [id])
+  genericId       Int
+  brand           Brand         @relation(fields: [brandId], references: [id])
+  brandId         Int
+
+  salesInfo             MedicineSalesInfo @relation(fields: [medicineSalesInfoIdId], references: [id])
+  medicineSalesInfoIdId Int
+
+  inventory   Inventory @relation(fields: [inventoryId], references: [id])
+  inventoryId Int
+
+  unit   Unit @relation(fields: [unitId], references: [id])
+  unitId Int
+
+  createdAt DateTime @default(now())
+  updatedat DateTime @updatedAt
+
+  @@index([barCode])
+  @@index([itemCode])
+  @@index([categoryId])
+  @@index([pharmacologicId])
+  @@index([genericId])
+  @@index([brandId])
+  @@index([medicineSalesInfoIdId])
+  @@index([inventoryId])
+  @@index([unitId])
+  @@schema("medicine")
+}
+
+model Pharmacologic {
+  id          Int        @id @default(autoincrement())
+  name        String     @db.VarChar(50)
+  description String     @db.VarChar(150)
+  medicine    Medicine[]
+
+  createdAt DateTime @default(now())
+  updatedat DateTime @updatedAt
+
+  @@schema("medicine")
+}
+
+model Category {
+  id          Int        @id @default(autoincrement())
+  name        String     @db.VarChar(50)
+  description String     @db.VarChar(150)
+  medicine    Medicine[]
+
+  createdAt DateTime @default(now())
+  updatedat DateTime @updatedAt
+
+  @@schema("medicine")
+}
+
+model Generic {
+  id          Int        @id @default(autoincrement())
+  name        String     @db.VarChar(50)
+  description String     @db.VarChar(150)
+  medicine    Medicine[]
+
+  createdAt DateTime @default(now())
+  updatedat DateTime @updatedAt
+
+  @@schema("medicine")
+}
+
+model Brand {
+  id          Int        @id @default(autoincrement())
+  name        String     @db.VarChar(50)
+  description String     @db.VarChar(150)
+  medicine    Medicine[]
+
+  createdAt DateTime @default(now())
+  updatedat DateTime @updatedAt
+
+  @@schema("medicine")
+}
+
+model Unit {
+  id Int @id @default(autoincrement())
+
+  name        String     @db.VarChar(50)
+  description String     @db.VarChar(150)
+  medicine    Medicine[]
+
+  createdAt DateTime @default(now())
+  updatedat DateTime @updatedAt
+
+  @@schema("medicine")
+}
+
+model Inventory {
+  id Int @id @default(autoincrement())
+
+  status            InventoryStatus @relation(fields: [inventoryStatusId], references: [id])
+  inventoryStatusId Int
+
+  qty         Int
+  section     String
+  expirynDate DateTime
+  medicine    Medicine[]
+
+  @@schema("inventory")
+}
+
+model InventoryStatus {
+  id Int @id @default(autoincrement())
+
+  name        String      @db.VarChar(50)
+  description String      @db.VarChar(150)
+  inventory   Inventory[]
+
+  @@schema("inventory")
+}
+
+model Sales {
+  id Int @id @default(autoincrement())
+
+  receiptNo   String              @unique
+  items       SalesPurchaseItem[]
+  totalAmount Decimal
+
+  cashier        String
+  amountTendered Decimal
+  change         Decimal
+
+  payment   Payment @relation(fields: [paymentId], references: [id])
+  paymentId Int
+
+  file   File @relation(fields: [fileId], references: [id])
+  fileId Int
+
+  purchaseate DateTime
+  createdAt   DateTime @default(now())
+  updatedat   DateTime @updatedAt
+
+  @@index([receiptNo])
+  @@schema("sales")
+}
+
+model SalesPurchaseItem {
+  id Int @id @default(autoincrement())
+
+  itemCode  String
+  qty       Int
+  unitPrice Decimal
+  total     Decimal
+  subTotal  Decimal
+  note      String
+  sales     Sales   @relation(fields: [salesId], references: [id])
+  salesId   Int
+
+  createdAt DateTime @default(now())
+  updatedat DateTime @updatedAt
+
+  @@schema("sales")
+}
+
+model Payment {
+  id Int @id @default(autoincrement())
+
+  name        String @db.VarChar(50)
+  description String @db.VarChar(150)
+
+  ewallet   EWallet @relation(fields: [eWalletId], references: [id])
+  eWalletId Int
+  sales     Sales[]
+
+  createdAt DateTime @default(now())
+  updatedat DateTime @updatedAt
+
+  @@schema("sales")
+}
+
+model EWallet {
+  id          Int       @id @default(autoincrement())
+  name        String    @db.VarChar(50)
+  description String    @db.VarChar(150)
+  payment     Payment[]
+
+  createdAt DateTime @default(now())
+  updatedat DateTime @updatedAt
+
+  @@schema("sales")
+}
+
+model MedicineSalesInfo {
+  id            Int        @id @default(autoincrement())
+  purchasePrice Decimal
+  sellingPrice  Decimal
+  discount      Discount   @relation(fields: [discountId], references: [id])
+  discountId    Int
+  medicine      Medicine[]
+
+  createdAt DateTime @default(now())
+  updatedat DateTime @updatedAt
+
+  @@schema("sales")
+}
+
+model Discount {
+  id          Int                 @id @default(autoincrement())
+  name        String              @db.VarChar(50)
+  description String              @db.VarChar(150)
+  salesInfoId MedicineSalesInfo[]
+
+  createdAt DateTime @default(now())
+  updatedat DateTime @updatedAt
+
+  @@schema("sales")
+}
+
+model FileType {
+  id          Int    @id @default(autoincrement())
+  name        String @db.VarChar(50)
+  description String @db.VarChar(150)
+
+  createdAt DateTime @default(now())
+  updatedat DateTime @updatedAt
+  file      File[]
+
+  @@schema("medicine")
+}
+
+model File {
+  id Int @id @default(autoincrement())
+
+  fileName  String
+  objectKey String @unique
+  url       String
+
+  fileType   FileType @relation(fields: [fileTypeId], references: [id])
+  fileTypeId Int
+
+  description String?
+
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  medicine  Medicine[]
+  sales     Sales[]
+
+  @@index([fileTypeId])
+  @@index([createdAt])
+  @@schema("medicine")
+}
