@@ -7,11 +7,11 @@ WORKDIR /app
 
 # Install ALL deps (including dev) — needed for tsc, prisma generate
 COPY package*.json ./
+# Prisma needs the schema present before `generate` will work
+
+COPY prisma ./prisma/
 RUN npm ci
 
-# Prisma needs the schema present before `generate` will work
-COPY prisma ./prisma/
-RUN npx prisma generate
 
 # Now bring in the rest of the source and compile
 COPY . .
