@@ -52,3 +52,12 @@ jobs:
           annotations: ${{ steps.meta.outputs.annotations }}
           provenance: true
           sbom: true
+          
+    deploy:
+        needs: build
+        runs-on: ubuntu-latest
+
+        steps:
+          - name: Trigger Render Deploy Hook
+            run: |
+              curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
