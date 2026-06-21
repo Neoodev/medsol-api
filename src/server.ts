@@ -2,5 +2,7 @@ import app from './app';
 import { config } from './config/env';
 
 app.listen(config.port, '0.0.0.0', () => {
-  console.log(`🚀 Server running on http://localhost:${config.port} [${config.env}]`);
+  console.log(
+    `🚀 Server running on ${config.env === 'development' ? `http://localhost:${config.port}` : `${config.apiBaseUrl}`} [${config.env}]`,
+  );
 });
