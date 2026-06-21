@@ -1,4 +1,4 @@
-name: Github CI
+name: Github Verify CI
 
 on:
   pull_request:
@@ -18,8 +18,10 @@ jobs:
           node-version: 22
           cache: npm
 
+      # CI check
       - run: npm ci
       
+      # Prettier check
       - run: npm run format:check
 
       - run: npx prisma generate
