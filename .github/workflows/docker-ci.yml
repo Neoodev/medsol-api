@@ -27,6 +27,9 @@ jobs:
         uses: docker/metadata-action@v6
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: | 
+            type=ref,event=branch 
+            type=sha
 
       - name: Login to GHCR
         if: github.event_name != 'pull_request'
