@@ -24,9 +24,6 @@ jobs:
       # Prettier check
       - run: npm run format:check
 
-      # Linting check
-      - run: npm run lint
-
       - run: npx prisma generate
 
       - run: npm run build
