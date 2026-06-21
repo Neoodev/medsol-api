@@ -7,4 +7,5 @@ export const config = {
   port: parseInt(process.env.PORT || '3000', 10),
   databaseUrl: process.env.DATABASE_URL || '',
   logLevel: process.env.LOG_LEVEL || 'tiny',
+  apiBaseUrl: process.env.API_BASE_URL || '',
 };
