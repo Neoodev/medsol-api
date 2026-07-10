@@ -7,7 +7,7 @@ datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
-  schemas   = ["users", "medicine", "sales", "inventory", "modules"]
+  schemas   = ["inventory", "medicine", "modules", "sales", "users"]
 }
 
 model User {
@@ -24,10 +24,9 @@ model Module {
   id          Int         @id @default(autoincrement())
   name        String      @db.VarChar(50)
   description String      @db.VarChar(150)
+  createdAt   DateTime    @default(now())
+  updatedat   DateTime    @updatedAt
   subModules  SubModule[]
-
-  createdAt DateTime @default(now())
-  updatedat DateTime @updatedAt
 
   @@schema("modules")
 }
@@ -36,44 +35,38 @@ model SubModule {
   id          Int    @id @default(autoincrement())
   name        String @db.VarChar(50)
   description String @db.VarChar(150)
-  module      Module @relation(fields: [moduleId], references: [id])
   moduleId    Int
+  module      Module @relation(fields: [moduleId], references: [id])
 
   @@schema("modules")
 }
 
 model Medicine {
-  id       Int     @id @default(autoincrement())
-  barCode  String?
-  itemCode String
-
-  manuFacturer String?
-
-  purchaseDate    DateTime?
-  serialNumber    String?
-  productionDate  DateTime?
-  file            File?         @relation(fields: [fileId], references: [id])
-  fileId          Int?
-  category        Category      @relation(fields: [categoryId], references: [id])
-  categoryId      Int
-  pharmacologic   Pharmacologic @relation(fields: [pharmacologicId], references: [id])
-  pharmacologicId Int
-  generic         Generic       @relation(fields: [genericId], references: [id])
-  genericId       Int
-  brand           Brand         @relation(fields: [brandId], references: [id])
-  brandId         Int
-
-  salesInfo             MedicineSalesInfo @relation(fields: [medicineSalesInfoIdId], references: [id])
+  id                    Int               @id @default(autoincrement())
+  barCode               String?
+  itemCode              String
+  manuFacturer          String?
+  purchaseDate          DateTime?
+  serialNumber          String?
+  productionDate        DateTime?
+  fileId                Int?
+  categoryId            Int
+  pharmacologicId       Int
+  genericId             Int
+  brandId               Int
   medicineSalesInfoIdId Int
-
-  inventory   Inventory @relation(fields: [inventoryId], references: [id])
-  inventoryId Int
-
-  unit   Unit @relation(fields: [unitId], references: [id])
-  unitId Int
-
-  createdAt DateTime @default(now())
-  updatedat DateTime @updatedAt
+  inventoryId           Int
+  unitId                Int
+  createdAt             DateTime          @default(now())
+  updatedat             DateTime          @updatedAt
+  brand                 Brand             @relation(fields: [brandId], references: [id])
+  category              Category          @relation(fields: [categoryId], references: [id])
+  file                  File?             @relation(fields: [fileId], references: [id])
+  generic               Generic           @relation(fields: [genericId], references: [id])
+  inventory             Inventory         @relation(fields: [inventoryId], references: [id])
+  salesInfo             MedicineSalesInfo @relation(fields: [medicineSalesInfoIdId], references: [id])
+  pharmacologic         Pharmacologic     @relation(fields: [pharmacologicId], references: [id])
+  unit                  Unit              @relation(fields: [unitId], references: [id])
 
   @@index([barCode])
   @@index([itemCode])
@@ -91,10 +84,9 @@ model Pharmacologic {
   id          Int        @id @default(autoincrement())
   name        String     @db.VarChar(50)
   description String     @db.VarChar(150)
+  createdAt   DateTime   @default(now())
+  updatedat   DateTime   @updatedAt
   medicine    Medicine[]
-
-  createdAt DateTime @default(now())
-  updatedat DateTime @updatedAt
 
   @@schema("medicine")
 }
@@ -103,10 +95,9 @@ model Category {
   id          Int        @id @default(autoincrement())
   name        String     @db.VarChar(50)
   description String     @db.VarChar(150)
+  createdAt   DateTime   @default(now())
+  updatedat   DateTime   @updatedAt
   medicine    Medicine[]
-
-  createdAt DateTime @default(now())
-  updatedat DateTime @updatedAt
 
   @@schema("medicine")
 }
@@ -115,10 +106,9 @@ model Generic {
   id          Int        @id @default(autoincrement())
   name        String     @db.VarChar(50)
   description String     @db.VarChar(150)
+  createdAt   DateTime   @default(now())
+  updatedat   DateTime   @updatedAt
   medicine    Medicine[]
-
-  createdAt DateTime @default(now())
-  updatedat DateTime @updatedAt
 
   @@schema("medicine")
 }
@@ -127,44 +117,38 @@ model Brand {
   id          Int        @id @default(autoincrement())
   name        String     @db.VarChar(50)
   description String     @db.VarChar(150)
+  createdAt   DateTime   @default(now())
+  updatedat   DateTime   @updatedAt
   medicine    Medicine[]
-
-  createdAt DateTime @default(now())
-  updatedat DateTime @updatedAt
 
   @@schema("medicine")
 }
 
 model Unit {
-  id Int @id @default(autoincrement())
-
+  id          Int        @id @default(autoincrement())
   name        String     @db.VarChar(50)
   description String     @db.VarChar(150)
+  createdAt   DateTime   @default(now())
+  updatedat   DateTime   @updatedAt
   medicine    Medicine[]
-
-  createdAt DateTime @default(now())
-  updatedat DateTime @updatedAt
 
   @@schema("medicine")
 }
 
 model Inventory {
-  id Int @id @default(autoincrement())
-
-  status            InventoryStatus @relation(fields: [inventoryStatusId], references: [id])
+  id                Int             @id @default(autoincrement())
   inventoryStatusId Int
-
-  qty         Int
-  section     String
-  expirynDate DateTime
-  medicine    Medicine[]
+  qty               Int
+  section           String
+  expirynDate       DateTime
+  status            InventoryStatus @relation(fields: [inventoryStatusId], references: [id])
+  medicine          Medicine[]
 
   @@schema("inventory")
 }
 
 model InventoryStatus {
-  id Int @id @default(autoincrement())
-
+  id          Int         @id @default(autoincrement())
   name        String      @db.VarChar(50)
   description String      @db.VarChar(150)
   inventory   Inventory[]
@@ -173,60 +157,50 @@ model InventoryStatus {
 }
 
 model Sales {
-  id Int @id @default(autoincrement())
-
-  receiptNo   String              @unique
-  items       SalesPurchaseItem[]
-  totalAmount Decimal
-
+  id             Int                 @id @default(autoincrement())
+  receiptNo      String              @unique
+  totalAmount    Decimal
   cashier        String
   amountTendered Decimal
   change         Decimal
-
-  payment   Payment @relation(fields: [paymentId], references: [id])
-  paymentId Int
-
-  file   File @relation(fields: [fileId], references: [id])
-  fileId Int
-
-  purchaseate DateTime
-  createdAt   DateTime @default(now())
-  updatedat   DateTime @updatedAt
+  paymentId      Int
+  fileId         Int
+  purchaseate    DateTime
+  createdAt      DateTime            @default(now())
+  updatedat      DateTime            @updatedAt
+  file           File                @relation(fields: [fileId], references: [id])
+  payment        Payment             @relation(fields: [paymentId], references: [id])
+  items          SalesPurchaseItem[]
 
   @@index([receiptNo])
   @@schema("sales")
 }
 
 model SalesPurchaseItem {
-  id Int @id @default(autoincrement())
-
+  id        Int      @id @default(autoincrement())
   itemCode  String
   qty       Int
   unitPrice Decimal
   total     Decimal
   subTotal  Decimal
   note      String
-  sales     Sales   @relation(fields: [salesId], references: [id])
   salesId   Int
-
   createdAt DateTime @default(now())
   updatedat DateTime @updatedAt
+  sales     Sales    @relation(fields: [salesId], references: [id])
 
   @@schema("sales")
 }
 
 model Payment {
-  id Int @id @default(autoincrement())
-
-  name        String @db.VarChar(50)
-  description String @db.VarChar(150)
-
-  ewallet   EWallet @relation(fields: [eWalletId], references: [id])
-  eWalletId Int
-  sales     Sales[]
-
-  createdAt DateTime @default(now())
-  updatedat DateTime @updatedAt
+  id          Int      @id @default(autoincrement())
+  name        String   @db.VarChar(50)
+  description String   @db.VarChar(150)
+  eWalletId   Int
+  createdAt   DateTime @default(now())
+  updatedat   DateTime @updatedAt
+  ewallet     EWallet  @relation(fields: [eWalletId], references: [id])
+  sales       Sales[]
 
   @@schema("sales")
 }
@@ -235,10 +209,9 @@ model EWallet {
   id          Int       @id @default(autoincrement())
   name        String    @db.VarChar(50)
   description String    @db.VarChar(150)
+  createdAt   DateTime  @default(now())
+  updatedat   DateTime  @updatedAt
   payment     Payment[]
-
-  createdAt DateTime @default(now())
-  updatedat DateTime @updatedAt
 
   @@schema("sales")
 }
@@ -247,12 +220,11 @@ model MedicineSalesInfo {
   id            Int        @id @default(autoincrement())
   purchasePrice Decimal
   sellingPrice  Decimal
-  discount      Discount   @relation(fields: [discountId], references: [id])
   discountId    Int
+  createdAt     DateTime   @default(now())
+  updatedat     DateTime   @updatedAt
   medicine      Medicine[]
-
-  createdAt DateTime @default(now())
-  updatedat DateTime @updatedAt
+  discount      Discount   @relation(fields: [discountId], references: [id])
 
   @@schema("sales")
 }
@@ -261,42 +233,36 @@ model Discount {
   id          Int                 @id @default(autoincrement())
   name        String              @db.VarChar(50)
   description String              @db.VarChar(150)
+  createdAt   DateTime            @default(now())
+  updatedat   DateTime            @updatedAt
   salesInfoId MedicineSalesInfo[]
-
-  createdAt DateTime @default(now())
-  updatedat DateTime @updatedAt
 
   @@schema("sales")
 }
 
 model FileType {
-  id          Int    @id @default(autoincrement())
-  name        String @db.VarChar(50)
-  description String @db.VarChar(150)
-
-  createdAt DateTime @default(now())
-  updatedat DateTime @updatedAt
-  file      File[]
+  id          Int      @id @default(autoincrement())
+  name        String   @db.VarChar(50)
+  description String   @db.VarChar(150)
+  createdAt   DateTime @default(now())
+  updatedat   DateTime @updatedAt
+  file        File[]
 
   @@schema("medicine")
 }
 
 model File {
-  id Int @id @default(autoincrement())
-
-  fileName  String
-  objectKey String @unique
-  url       String
-
-  fileType   FileType @relation(fields: [fileTypeId], references: [id])
-  fileTypeId Int
-
+  id          Int        @id @default(autoincrement())
+  fileName    String
+  objectKey   String     @unique
+  url         String
+  fileTypeId  Int
   description String?
-
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  medicine  Medicine[]
-  sales     Sales[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  fileType    FileType   @relation(fields: [fileTypeId], references: [id])
+  medicine    Medicine[]
+  sales       Sales[]
 
   @@index([fileTypeId])
   @@index([createdAt])
