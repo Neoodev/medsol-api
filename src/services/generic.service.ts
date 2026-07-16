@@ -42,4 +42,9 @@ export class GenericService {
     const generic = await this.getGeneric(id);
     return prisma.generic.update({ where: { id: generic.id }, data });
   }
+
+  async delete(id: number) {
+    const generic = await this.getGeneric(id);
+    return prisma.generic.delete({ where: { id: generic.id } });
+  }
 }

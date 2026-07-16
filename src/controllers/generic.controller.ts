@@ -27,3 +27,9 @@ export const updateGeneric = catchAsync(async (req: Request, res: Response) => {
   const generic = await genericService.update(+req.params.genericId, req.body);
   res.success(generic, 'Generic updated successfully');
 });
+
+export const deleteGeneric = catchAsync(async (req: Request, res: Response) => {
+  const genericId = Number(req.params.genericId);
+  await genericService.delete(genericId);
+  res.status(204).send();
+});

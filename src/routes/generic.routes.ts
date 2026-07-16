@@ -1,6 +1,7 @@
 import { validate } from '../middlewares/validate';
 import {
   createGeneric,
+  deleteGeneric,
   getGeneric,
   getGenerics,
   updateGeneric,
@@ -13,5 +14,5 @@ router.get('/:genericId', getGeneric);
 router.get('/', getGenerics);
 router.post('/', validate(createGenericSchema), createGeneric);
 router.patch('/:genericId', validate(updateGenericSchema), updateGeneric);
-
+router.delete('/:genericId', deleteGeneric);
 export default router;
