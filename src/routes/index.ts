@@ -9,7 +9,7 @@ router.get('/health', (_req, res) => {
   res.success(null, 'OK');
 });
 
-router.use('/users', userRoutes);
-router.use('/generics', genericRoutes);
+router.use('/user', userRoutes);
+router.use('/generic', genericRoutes);
 
 export default router;
