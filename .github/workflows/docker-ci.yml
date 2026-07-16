@@ -27,7 +27,7 @@ jobs:
         uses: docker/metadata-action@v6
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: | 
+          tags: |
             type=ref,event=branch 
             type=sha
 
@@ -52,3 +52,9 @@ jobs:
           annotations: ${{ steps.meta.outputs.annotations }}
           provenance: true
           sbom: true
+
+      - name: Trigger Render Deploy
+        if: github.event_name != 'pull_request'
+        run: curl -X POST "$RENDER_DEPLOY_HOOK"
+        env:
+          RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
